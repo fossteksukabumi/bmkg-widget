@@ -1,53 +1,135 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Widget Cuaca BMKG</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prakiraan Cuaca BMKG</title>
   <style>
     body {
-      font-family: sans-serif;
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%);
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       min-height: 100vh;
-      background: #f3f7fa;
     }
-    .widget {
-      max-width: 300px;
-      background: #eaf2f8;
-      border-radius: 12px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-      padding: 16px;
+
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      padding: 24px 28px;
       text-align: center;
+      width: 320px;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+    }
+
+    .location {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1976d2;
+      margin-bottom: 6px;
+    }
+
+    .date {
+      font-size: 13px;
+      color: #757575;
+      margin-bottom: 20px;
+    }
+
+    .icon {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 10px;
+    }
+
+    .temp {
+      font-size: 42px;
+      font-weight: 600;
+      color: #212121;
+    }
+
+    .desc {
+      font-size: 16px;
+      color: #424242;
+      margin-bottom: 20px;
+    }
+
+    .details {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #555;
+    }
+
+    footer {
+      font-size: 11px;
+      color: #888;
+      margin-top: 20px;
+    }
+
+    footer a {
+      color: #1976d2;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <div class="widget" id="weather">Memuat data cuaca...</div>
+  <div class="card" id="weather">
+    <p>Memuat data cuaca...</p>
+  </div>
 
   <script>
     async function loadWeather() {
-      const params = new URLSearchParams(window.location.search);
-      const kode = params.get("kode") || "31.71.03.1001"; // default Kemayoran
+      const kode = new URLSearchParams(window.location.search).get("kode") || "31.71.03.1001"; // default Kemayoran
       const el = document.getElementById("weather");
+
       try {
         const res = await fetch(`https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${kode}`);
         const json = await res.json();
-        const cuaca = json.data[0]?.cuaca[0];
-        if (!cuaca) throw new Error("Data tidak ditemukan");
+
+        const lokasi = json.lokasi?.desa || "Tidak diketahui";
+        const data = json.data?.[0]?.cuaca?.[0];
+        if (!data) throw new Error("Data tidak ditemukan");
+
+        const iconMap = {
+          "Cerah": "☀️",
+          "Cerah Berawan": "🌤️",
+          "Berawan": "⛅",
+          "Berawan Tebal": "☁️",
+          "Hujan Ringan": "🌦️",
+          "Hujan Sedang": "🌧️",
+          "Hujan Lebat": "⛈️",
+          "Kabut": "🌫️"
+        };
+
+        const icon = iconMap[data.weather_desc] || "🌦️";
+
         el.innerHTML = `
-          <h3>🌦️ Prakiraan Cuaca</h3>
-          <p><b>Waktu:</b> ${cuaca.local_datetime}</p>
-          <p><b>Suhu:</b> ${cuaca.t}°C</p>
-          <p><b>Kelembapan:</b> ${cuaca.hu}%</p>
-          <p><b>Kondisi:</b> ${cuaca.weather_desc}</p>
-          <small>Sumber: BMKG</small>
+          <div class="location">${lokasi}</div>
+          <div class="date">${new Date(data.local_datetime).toLocaleString("id-ID", { dateStyle: "full", timeStyle: "short" })}</div>
+          <div class="icon">${icon}</div>
+          <div class="temp">${data.t}°C</div>
+          <div class="desc">${data.weather_desc}</div>
+          <div class="details">
+            <div>💧 Kelembapan: ${data.hu}%</div>
+            <div>🌬️ Angin: ${data.ws} km/jam</div>
+          </div>
+          <footer>
+            Sumber data: <a href="https://www.bmkg.go.id" target="_blank">BMKG</a>
+          </footer>
         `;
-      } catch (e) {
-        el.innerHTML = "<p style='color:red'>Gagal ambil data BMKG 😢</p>";
+      } catch (err) {
+        console.error(err);
+        el.innerHTML = `<p style="color:red">Gagal memuat data cuaca 😢</p>`;
       }
     }
+
     loadWeather();
   </script>
 </body>
