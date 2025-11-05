@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prakiraan Cuaca Jakarta Barat</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       font-family: "Poppins", sans-serif;
       background: #f5f9ff;
@@ -21,79 +17,45 @@
       text-align: center;
       background: #0077b6;
       color: white;
-      padding: clamp(12px, 2vw, 16px);
-      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      padding: 16px;
+      font-size: 1.5rem;
       font-weight: 600;
     }
 
     .container {
-      max-width: min(1400px, 95vw);
-      margin: clamp(15px, 3vw, 20px) auto;
-      padding: 0 clamp(10px, 2vw, 15px);
-    }
-
-    .table-wrapper {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      overflow: hidden;
-    }
-
-    .table-scroll {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
       overflow-x: auto;
-      overflow-y: visible;
-      -webkit-overflow-scrolling: touch;
-      max-width: 100%;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+      min-width: 900px;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
     th, td {
       border: 1px solid #e1e8f0;
-      padding: clamp(6px, 1.2vw, 12px) clamp(4px, 1vw, 8px);
+      padding: 10px;
       text-align: center;
-      white-space: nowrap;
     }
 
     th {
       background: #0077b6;
       color: white;
       font-weight: 600;
-      font-size: clamp(0.75rem, 1.3vw, 0.9rem);
-    }
-
-    th:first-child {
       position: sticky;
-      left: 0;
-      z-index: 3;
-      min-width: clamp(95px, 15vw, 140px);
-      max-width: clamp(95px, 15vw, 140px);
-    }
-
-    td:first-child {
-      position: sticky;
-      left: 0;
-      background: white;
-      font-weight: 600;
-      z-index: 2;
-      min-width: clamp(95px, 15vw, 140px);
-      max-width: clamp(95px, 15vw, 140px);
-      text-align: left;
-      padding-left: clamp(8px, 1.5vw, 12px);
-      font-size: clamp(0.7rem, 1.2vw, 0.85rem);
-    }
-
-    tr:nth-child(even) td:first-child {
-      background: #f8fbff;
+      top: 0;
+      z-index: 1;
     }
 
     td {
-      min-width: clamp(95px, 12vw, 140px);
-      max-width: clamp(95px, 12vw, 140px);
+      font-size: 0.95rem;
     }
 
     tr:nth-child(even) {
@@ -104,114 +66,26 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: clamp(2px, 0.5vw, 4px);
-      padding: clamp(2px, 0.5vw, 4px);
+      gap: 4px;
     }
 
     .icon {
-      font-size: clamp(1.3rem, 2.2vw, 1.8rem);
-      line-height: 1;
-    }
-
-    .weather-desc {
-      font-size: clamp(0.7rem, 1.1vw, 0.85rem);
-      font-weight: 500;
-      margin: clamp(1px, 0.3vw, 2px) 0;
-      line-height: 1.2;
-    }
-
-    .weather small {
-      font-size: clamp(0.65rem, 1vw, 0.75rem);
-      color: #555;
-      line-height: 1.3;
+      font-size: 1.5rem;
     }
 
     footer {
       text-align: center;
-      padding: clamp(12px, 2vw, 15px);
-      font-size: clamp(0.75rem, 1.2vw, 0.85rem);
+      padding: 15px;
+      font-size: 0.85rem;
       color: #555;
       background: #f1faff;
-      margin-top: clamp(20px, 4vw, 30px);
+      margin-top: 40px;
     }
 
-    .scroll-hint {
-      text-align: center;
-      padding: clamp(6px, 1.2vw, 8px);
-      background: #e3f2fd;
-      color: #0077b6;
-      font-size: clamp(0.75rem, 1.2vw, 0.85rem);
-      border-radius: 5px;
-      margin-bottom: clamp(8px, 1.5vw, 10px);
-    }
-
-    .loading {
-      text-align: center;
-      padding: clamp(30px, 5vw, 40px);
-      font-size: clamp(0.95rem, 1.5vw, 1.1rem);
-      color: #0077b6;
-    }
-
-    /* Media queries untuk layar dengan DPI tinggi / zoom */
-    @media (min-resolution: 144dpi) and (max-width: 1400px) {
-      table {
-        font-size: clamp(0.65rem, 1.1vw, 0.8rem);
-      }
-      
+    @media (max-width: 600px) {
       th, td {
-        padding: clamp(5px, 1vw, 10px) clamp(3px, 0.8vw, 6px);
-      }
-    }
-
-    /* Untuk layar dengan zoom 150% atau lebih */
-    @media (min-width: 1024px) and (max-width: 1600px) {
-      .container {
-        max-width: 98vw;
-      }
-      
-      td, th {
-        min-width: clamp(85px, 11vw, 120px);
-        max-width: clamp(85px, 11vw, 120px);
-      }
-      
-      th:first-child,
-      td:first-child {
-        min-width: clamp(85px, 13vw, 120px);
-        max-width: clamp(85px, 13vw, 120px);
-      }
-    }
-
-    @media (max-width: 768px) {
-      header {
-        font-size: clamp(1rem, 3vw, 1.2rem);
-      }
-
-      th, td {
-        min-width: clamp(90px, 14vw, 110px);
-        max-width: clamp(90px, 14vw, 110px);
-      }
-
-      th:first-child,
-      td:first-child {
-        min-width: clamp(90px, 16vw, 110px);
-        max-width: clamp(90px, 16vw, 110px);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        padding: 0 8px;
-      }
-
-      th, td {
-        min-width: clamp(85px, 18vw, 95px);
-        max-width: clamp(85px, 18vw, 95px);
-      }
-
-      th:first-child,
-      td:first-child {
-        min-width: clamp(85px, 20vw, 95px);
-        max-width: clamp(85px, 20vw, 95px);
+        padding: 8px;
+        font-size: 0.8rem;
       }
     }
   </style>
@@ -220,27 +94,22 @@
   <header>🌦️ Prakiraan Cuaca - Jakarta Barat</header>
 
   <div class="container">
-    <div class="scroll-hint">💡 Geser tabel ke kanan untuk melihat prakiraan hari berikutnya →</div>
-    
-    <div class="table-wrapper">
-      <div class="table-scroll">
-        <table id="forecast-table">
-          <thead>
-            <tr id="table-header">
-              <th>Kelurahan</th>
-            </tr>
-          </thead>
-          <tbody id="table-body">
-            <tr><td colspan="9" class="loading">⏳ Memuat data cuaca...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <table id="forecast-table">
+      <thead>
+        <tr id="table-header">
+          <th>Kelurahan / Desa</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr><td colspan="9">Memuat data cuaca...</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <footer>Sumber data: <strong>BMKG (api.bmkg.go.id)</strong></footer>
 
   <script>
+    // Daftar kode wilayah kelurahan di Kecamatan Cengkareng
     const wilayah = [
       { nama: "Cengkareng Barat", kode: "31.73.01.1001" },
       { nama: "Cengkareng Timur", kode: "31.73.01.1002" },
@@ -253,63 +122,62 @@
     async function getWeather() {
       const headerRow = document.getElementById("table-header");
       const body = document.getElementById("table-body");
+      body.innerHTML = "<tr><td colspan='9'>⏳ Memuat...</td></tr>";
 
-      try {
-        const sample = await fetch(`https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${wilayah[0].kode}`);
-        const sampleData = await sample.json();
-        const cuacaSample = sampleData.data[0].cuaca;
-        const tanggalList = cuacaSample.map(d => new Date(d[0].local_datetime));
+     
+      const sample = await fetch(`https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${wilayah[0].kode}`);
+      const sampleData = await sample.json();
+      const cuacaSample = sampleData.data[0].cuaca;
+      const tanggalList = cuacaSample.map(d => new Date(d[0].local_datetime));
 
-        tanggalList.forEach((tgl, i) => {
-          const label = tgl.toLocaleDateString("id-ID", { weekday: "short", day: "2-digit", month: "short" });
-          const th = document.createElement("th");
-          th.textContent = label;
-          headerRow.appendChild(th);
-        });
+     
+      tanggalList.forEach((tgl, i) => {
+        const label = tgl.toLocaleDateString("id-ID", { weekday: "short", day: "2-digit", month: "short" });
+        const th = document.createElement("th");
+        th.textContent = label;
+        headerRow.appendChild(th);
+      });
 
-        body.innerHTML = "";
-        for (const area of wilayah) {
-          try {
-            const res = await fetch(`https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${area.kode}`);
-            const data = await res.json();
-            const cuaca = data.data[0].cuaca;
 
-            const row = document.createElement("tr");
-            const namaCell = document.createElement("td");
-            namaCell.textContent = area.nama;
-            row.appendChild(namaCell);
+      body.innerHTML = "";
+      for (const area of wilayah) {
+        try {
+          const res = await fetch(`https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${area.kode}`);
+          const data = await res.json();
+          const cuaca = data.data[0].cuaca;
 
-            cuaca.forEach(hari => {
-              const temps = hari.map(d => d.t);
-              const hums = hari.map(d => d.hu);
-              const desc = hari.map(d => d.weather_desc);
-              const cuacaDominan = desc.sort((a,b)=>
-                desc.filter(v=>v===a).length - desc.filter(v=>v===b).length
-              ).pop();
+          const row = document.createElement("tr");
+          const namaCell = document.createElement("td");
+          namaCell.textContent = area.nama;
+          row.appendChild(namaCell);
 
-              const icon = getWeatherIcon(cuacaDominan);
-              const suhu = `${Math.min(...temps)}–${Math.max(...temps)}°C`;
-              const kelembapan = `${Math.min(...hums)}–${Math.max(...hums)}%`;
+          cuaca.forEach(hari => {
+            const temps = hari.map(d => d.t);
+            const hums = hari.map(d => d.hu);
+            const desc = hari.map(d => d.weather_desc);
+            const cuacaDominan = desc.sort((a,b)=>
+              desc.filter(v=>v===a).length - desc.filter(v=>v===b).length
+            ).pop();
 
-              const td = document.createElement("td");
-              td.innerHTML = `
-                <div class="weather">
-                  <span class="icon">${icon}</span>
-                  <span class="weather-desc">${cuacaDominan}</span>
-                  <small>${suhu}</small>
-                  <small>${kelembapan}</small>
-                </div>`;
-              row.appendChild(td);
-            });
+            const icon = getWeatherIcon(cuacaDominan);
+            const suhu = `${Math.min(...temps)}–${Math.max(...temps)}°C`;
+            const kelembapan = `${Math.min(...hums)}–${Math.max(...hums)}%`;
 
-            body.appendChild(row);
-          } catch (err) {
-            console.error("Gagal memuat", area.nama, err);
-          }
+            const td = document.createElement("td");
+            td.innerHTML = `
+              <div class="weather">
+                <span class="icon">${icon}</span>
+                <span>${cuacaDominan}</span>
+                <small>${suhu}</small>
+                <small>${kelembapan}</small>
+              </div>`;
+            row.appendChild(td);
+          });
+
+          body.appendChild(row);
+        } catch (err) {
+          console.error("Gagal memuat", area.nama, err);
         }
-      } catch (err) {
-        body.innerHTML = "<tr><td colspan='9' class='loading'>❌ Gagal memuat data. Silakan refresh halaman.</td></tr>";
-        console.error("Error:", err);
       }
     }
 
