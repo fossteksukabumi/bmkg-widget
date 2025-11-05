@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Widget Cuaca BMKG</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #f3f7fa;
+    }
+    .widget {
+      max-width: 300px;
+      background: #eaf2f8;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      padding: 16px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="widget" id="weather">Memuat data cuaca...</div>
+
+  <script>
+    async function loadWeather() {
+      const params = new URLSearchParams(window.location.search);
+      const kode = params.get("kode") || "31.71.03.1001"; // default Kemayoran
+      const el = document.getElementById("weather");
+      try {
+        const res = await fetch(`https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${kode}`);
+        const json = await res.json();
+        const cuaca = json.data[0]?.cuaca[0];
+        if (!cuaca) throw new Error("Data tidak ditemukan");
+        el.innerHTML = `
+          <h3>🌦️ Prakiraan Cuaca</h3>
+          <p><b>Waktu:</b> ${cuaca.local_datetime}</p>
+          <p><b>Suhu:</b> ${cuaca.t}°C</p>
+          <p><b>Kelembapan:</b> ${cuaca.hu}%</p>
+          <p><b>Kondisi:</b> ${cuaca.weather_desc}</p>
+          <small>Sumber: BMKG</small>
+        `;
+      } catch (e) {
+        el.innerHTML = "<p style='color:red'>Gagal ambil data BMKG 😢</p>";
+      }
+    }
+    loadWeather();
+  </script>
+</body>
+</html>
