@@ -107,7 +107,7 @@
   </footer>
 
   <script>
-    const admCode = "31.73.01.1001"; // Kode wilayah: Cengkareng Barat (contoh)
+    const admCode = "31.71.03.1001";
     const API_URL = `https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${admCode}`;
 
     async function getWeather() {
@@ -117,10 +117,10 @@
         const res = await fetch(API_URL);
         const data = await res.json();
         container.innerHTML = "";
-        const cuaca = data.data[0].cuaca; // Array 3 hari
+        const cuaca = data.data[0].cuaca; 
 
         cuaca.forEach((hari, index) => {
-          // Ambil suhu min & max, kelembapan, cuaca dominan
+          
           const temps = hari.map(d => d.t);
           const hums = hari.map(d => d.hu);
           const deskripsi = hari.map(d => d.weather_desc);
