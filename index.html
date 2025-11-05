@@ -1,136 +1,119 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prakiraan Cuaca BMKG</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prakiraan Cuaca Cengkareng</title>
   <style>
     body {
-      margin: 0;
       font-family: "Poppins", sans-serif;
-      background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%);
+      background: linear-gradient(135deg, #74ebd5, #acb6e5);
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      margin: 0;
+      color: #222;
     }
 
-    .card {
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-      padding: 24px 28px;
+    .weather-card {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
       text-align: center;
-      width: 320px;
-      transition: transform 0.3s ease;
+      width: 340px;
+      transition: transform 0.2s;
     }
 
-    .card:hover {
-      transform: translateY(-3px);
+    .weather-card:hover {
+      transform: scale(1.02);
     }
 
-    .location {
-      font-size: 20px;
-      font-weight: 600;
-      color: #1976d2;
-      margin-bottom: 6px;
+    .weather-card img {
+      width: 120px;
+      height: 120px;
     }
 
-    .date {
-      font-size: 13px;
-      color: #757575;
-      margin-bottom: 20px;
-    }
-
-    .icon {
-      width: 90px;
-      height: 90px;
-      margin: 0 auto 10px;
+    h2 {
+      margin: 10px 0 5px;
+      font-size: 24px;
     }
 
     .temp {
       font-size: 42px;
       font-weight: 600;
-      color: #212121;
+      margin: 5px 0;
     }
 
     .desc {
-      font-size: 16px;
-      color: #424242;
-      margin-bottom: 20px;
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 15px;
     }
 
     .details {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      color: #555;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
     }
 
-    footer {
-      font-size: 11px;
-      color: #888;
-      margin-top: 20px;
-    }
-
-    footer a {
-      color: #1976d2;
-      text-decoration: none;
+    .loading {
+      text-align: center;
+      color: white;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
-  <div class="card" id="weather">
-    <p>Memuat data cuaca...</p>
+  <div id="app">
+    <div class="loading">Memuat prakiraan cuaca...</div>
   </div>
 
   <script>
-    async function loadWeather() {
-      const kode = new URLSearchParams(window.location.search).get("kode") || "31.71.03.1001"; // default Kemayoran
-      const el = document.getElementById("weather");
+    const kodeWilayah = "31.73.01.1001"; // 🟦 Cengkareng Barat
+    const apiURL = `https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${kodeWilayah}`;
 
+    async function fetchWeather() {
+      const app = document.getElementById("app");
       try {
-        const res = await fetch(`https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${kode}`);
-        const json = await res.json();
+        const response = await fetch(apiURL);
+        const data = await response.json();
 
-        const lokasi = json.lokasi?.desa || "Tidak diketahui";
-        const data = json.data?.[0]?.cuaca?.[0];
-        if (!data) throw new Error("Data tidak ditemukan");
+        const lokasi = data.lokasi?.desa || "Cengkareng";
+        const cuacaList = data.data?.[0]?.cuaca?.[0];
+        if (!cuacaList || !cuacaList.length) throw new Error("Data cuaca tidak ditemukan");
 
-        const iconMap = {
-          "Cerah": "☀️",
-          "Cerah Berawan": "🌤️",
-          "Berawan": "⛅",
-          "Berawan Tebal": "☁️",
-          "Hujan Ringan": "🌦️",
-          "Hujan Sedang": "🌧️",
-          "Hujan Lebat": "⛈️",
-          "Kabut": "🌫️"
-        };
+        const cuacaSekarang = cuacaList[0]; // ambil waktu pertama (terdekat)
+        const icon = cuacaSekarang.image;
+        const suhu = cuacaSekarang.t;
+        const deskripsi = cuacaSekarang.weather_desc;
+        const kelembapan = cuacaSekarang.hu;
+        const angin = cuacaSekarang.ws;
 
-        const icon = iconMap[data.weather_desc] || "🌦️";
-
-        el.innerHTML = `
-          <div class="location">${lokasi}</div>
-          <div class="date">${new Date(data.local_datetime).toLocaleString("id-ID", { dateStyle: "full", timeStyle: "short" })}</div>
-          <div class="icon">${icon}</div>
-          <div class="temp">${data.t}°C</div>
-          <div class="desc">${data.weather_desc}</div>
-          <div class="details">
-            <div>💧 Kelembapan: ${data.hu}%</div>
-            <div>🌬️ Angin: ${data.ws} km/jam</div>
+        app.innerHTML = `
+          <div class="weather-card">
+            <h2>${lokasi}</h2>
+            <p>${new Date(cuacaSekarang.local_datetime).toLocaleString("id-ID", {
+              weekday: "long",
+              hour: "2-digit",
+              minute: "2-digit"
+            })}</p>
+            <img src="${icon}" alt="${deskripsi}" />
+            <div class="temp">${suhu}°C</div>
+            <div class="desc">${deskripsi}</div>
+            <div class="details">
+              💧 Kelembapan: ${kelembapan}%<br/>
+              🌬️ Angin: ${angin} km/jam
+            </div>
           </div>
-          <footer>
-            Sumber data: <a href="https://www.bmkg.go.id" target="_blank">BMKG</a>
-          </footer>
         `;
       } catch (err) {
-        console.error(err);
-        el.innerHTML = `<p style="color:red">Gagal memuat data cuaca 😢</p>`;
+        app.innerHTML = `<div class="loading">Gagal memuat data cuaca 😢<br>${err.message}</div>`;
       }
     }
 
-    loadWeather();
+    fetchWeather();
   </script>
 </body>
 </html>
