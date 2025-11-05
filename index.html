@@ -91,7 +91,7 @@
   </style>
 </head>
 <body>
-  <header>🌦️ Prakiraan Cuaca - Jakarta Barat (BMKG Style)</header>
+  <header>🌦️ Prakiraan Cuaca - Jakarta Barat</header>
 
   <div class="container">
     <table id="forecast-table">
@@ -124,13 +124,13 @@
       const body = document.getElementById("table-body");
       body.innerHTML = "<tr><td colspan='9'>⏳ Memuat...</td></tr>";
 
-      // Ambil data pertama untuk tahu tanggal-tanggalnya
+     
       const sample = await fetch(`https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${wilayah[0].kode}`);
       const sampleData = await sample.json();
       const cuacaSample = sampleData.data[0].cuaca;
       const tanggalList = cuacaSample.map(d => new Date(d[0].local_datetime));
 
-      // Buat header kolom tanggal
+     
       tanggalList.forEach((tgl, i) => {
         const label = tgl.toLocaleDateString("id-ID", { weekday: "short", day: "2-digit", month: "short" });
         const th = document.createElement("th");
@@ -138,7 +138,7 @@
         headerRow.appendChild(th);
       });
 
-      // Isi tabel per kelurahan
+
       body.innerHTML = "";
       for (const area of wilayah) {
         try {
