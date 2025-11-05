@@ -3,115 +3,171 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prakiraan Cuaca Cengkareng (7 Hari)</title>
+  <title>Prakiraan Cuaca - Cengkareng</title>
   <style>
     body {
       font-family: "Poppins", sans-serif;
-      background: linear-gradient(135deg, #74ebd5, #acb6e5);
-      margin: 0;
-      padding: 30px;
+      background: linear-gradient(180deg, #e0f2ff 0%, #f8fbff 100%);
       color: #222;
+      margin: 0;
+      padding: 0;
     }
-    h1 {
+
+    header {
       text-align: center;
-      margin-bottom: 20px;
-    }
-    .forecast-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 20px;
-      justify-content: center;
-    }
-    .day-card {
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 16px;
-      padding: 15px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s;
-    }
-    .day-card:hover {
-      transform: translateY(-4px);
-    }
-    .day-card img {
-      width: 60px;
-      height: 60px;
-    }
-    .temp {
-      font-size: 18px;
+      padding: 20px;
+      background: #0077b6;
+      color: white;
+      font-size: 1.5rem;
       font-weight: 600;
     }
-    .humidity {
-      font-size: 14px;
-      color: #555;
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
     }
+
+    .weather-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .location {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #0077b6;
+      margin-bottom: 6px;
+    }
+
+    .date {
+      color: #555;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+
+    .icon {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
     .desc {
-      font-size: 15px;
-      margin: 8px 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .details {
+      font-size: 0.9rem;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 0.85rem;
+      color: #555;
+      background: #f1faff;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        font-size: 1.2rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Prakiraan Cuaca Cengkareng (7 Hari)</h1>
-  <div id="forecast" class="forecast-container">Memuat data...</div>
+  <header>🌦️ Prakiraan Cuaca - Cengkareng, Jakarta Barat</header>
+
+  <div class="container">
+    <div id="weather-grid" class="weather-grid">
+      <p style="grid-column: 1 / -1; text-align:center;">Memuat data cuaca...</p>
+    </div>
+  </div>
+
+  <footer>
+    Sumber data: <strong>BMKG (api.bmkg.go.id)</strong> • Diperbarui otomatis
+  </footer>
 
   <script>
-    const kodeWilayah = "31.73.01.1001"; // Cengkareng Barat
-    const apiURL = `https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${kodeWilayah}`;
+    const admCode = "31.73.01.1001"; // Kode wilayah: Cengkareng Barat (contoh)
+    const API_URL = `https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${admCode}`;
 
-    async function loadWeather() {
-      const container = document.getElementById("forecast");
+    async function getWeather() {
+      const container = document.getElementById("weather-grid");
+      container.innerHTML = "<p style='grid-column:1/-1;text-align:center;'>⏳ Memuat...</p>";
       try {
-        const res = await fetch(apiURL);
-        const json = await res.json();
-        const data = json.data?.[0]?.cuaca?.flat() || [];
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        container.innerHTML = "";
+        const cuaca = data.data[0].cuaca; // Array 3 hari
 
-        // kelompokkan per tanggal (local_datetime)
-        const grouped = {};
-        data.forEach(item => {
-          const date = item.local_datetime.split(" ")[0];
-          if (!grouped[date]) grouped[date] = [];
-          grouped[date].push(item);
+        cuaca.forEach((hari, index) => {
+          // Ambil suhu min & max, kelembapan, cuaca dominan
+          const temps = hari.map(d => d.t);
+          const hums = hari.map(d => d.hu);
+          const deskripsi = hari.map(d => d.weather_desc);
+          const tanggal = new Date(hari[0].local_datetime);
+          const tanggalLabel = tanggal.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" });
+
+          const suhuMin = Math.min(...temps);
+          const suhuMax = Math.max(...temps);
+          const kelembapan = `${Math.min(...hums)}–${Math.max(...hums)}%`;
+          const cuacaDominan = deskripsi.sort((a, b) =>
+            deskripsi.filter(v => v === a).length - deskripsi.filter(v => v === b).length
+          ).pop();
+
+          const icon = getWeatherIcon(cuacaDominan);
+
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <div class="location">${data.lokasi.desa}</div>
+            <div class="date">${tanggalLabel}</div>
+            <div class="icon">${icon}</div>
+            <div class="desc">${cuacaDominan}</div>
+            <div class="details">
+              🌡️ Suhu: ${suhuMin}–${suhuMax}°C <br>
+              💧 Kelembapan: ${kelembapan}
+            </div>
+          `;
+          container.appendChild(card);
         });
-
-        const days = Object.entries(grouped).map(([date, items]) => {
-          const temps = items.map(i => i.t);
-          const hums = items.map(i => i.hu);
-          const desc = mostFrequent(items.map(i => i.weather_desc));
-          const icon = items.find(i => i.image)?.image || "";
-          return {
-            date,
-            desc,
-            icon,
-            tempMin: Math.min(...temps),
-            tempMax: Math.max(...temps),
-            humMin: Math.min(...hums),
-            humMax: Math.max(...hums)
-          };
-        }).slice(0, 7); // ambil 7 hari ke depan
-
-        container.innerHTML = days.map(day => `
-          <div class="day-card">
-            <h3>${new Date(day.date).toLocaleDateString("id-ID", { weekday: "short", day: "2-digit", month: "short" })}</h3>
-            <img src="${day.icon}" alt="${day.desc}" />
-            <div class="desc">${day.desc}</div>
-            <div class="temp">${day.tempMin}–${day.tempMax} °C</div>
-            <div class="humidity">${day.humMin}–${day.humMax}%</div>
-          </div>
-        `).join("");
       } catch (err) {
-        container.innerHTML = "Gagal memuat data cuaca 😢";
+        container.innerHTML = "<p style='grid-column:1/-1;text-align:center;color:red;'>Gagal memuat data cuaca ❌</p>";
         console.error(err);
       }
     }
 
-    function mostFrequent(arr) {
-      return arr.sort((a,b) =>
-        arr.filter(v => v===a).length - arr.filter(v => v===b).length
-      ).pop();
+    function getWeatherIcon(desc) {
+      desc = desc.toLowerCase();
+      if (desc.includes("cerah")) return "☀️";
+      if (desc.includes("berawan")) return "⛅";
+      if (desc.includes("hujan ringan")) return "🌦️";
+      if (desc.includes("hujan")) return "🌧️";
+      if (desc.includes("badai")) return "⛈️";
+      if (desc.includes("kabut")) return "🌫️";
+      return "🌤️";
     }
 
-    loadWeather();
+    getWeather();
   </script>
 </body>
 </html>
